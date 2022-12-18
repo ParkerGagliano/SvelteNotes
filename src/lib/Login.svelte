@@ -33,7 +33,6 @@
   function handleLogin() {
     let response = checkValid();
     if (response == true) {
-      console.log("dasdasdasds");
       let myHeaders = new Headers();
       let urlencoded = new URLSearchParams();
       urlencoded.append("username", username);
@@ -53,9 +52,10 @@
   }
 
   function handleResult(result) {
-    if (result.status == "success") {
+    console.log(result);
+    if (result.message == "Login successfull") {
       console.log("success");
-      window.location.href = "/home";
+      successfulLogin(result);
     } else {
       modal = true;
       message = result.message;

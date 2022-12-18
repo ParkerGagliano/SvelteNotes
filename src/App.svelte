@@ -6,15 +6,18 @@
   import Login from "./lib/Login.svelte";
   let authenticated = false;
   let username = "";
-  let token = "";
-  function successfulLogin() {
-    console.log("dasdasdasds");
+  let token;
+  function successfulLogin(result) {
+    authenticated = true;
+    token = "JWT " + result.accessToken;
+    console.log(token);
+    username = result.user.username;
   }
 </script>
 
 <main>
   {#if authenticated}
-    <Home />
+    <Home {token} />
   {:else}
     <div class="container">
       <div class="row justify-content-center">
