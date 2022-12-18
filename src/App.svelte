@@ -17,7 +17,7 @@
 
 <main>
   {#if authenticated}
-    <Home {token} />
+    <Home {authenticated} {username} {token} />
   {:else}
     <div class="container">
       <div class="row justify-content-center">
