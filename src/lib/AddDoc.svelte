@@ -1,10 +1,14 @@
 <script>
+  import { get } from "svelte/store";
+  import { fade } from "svelte/transition";
+  import { fly } from "svelte/transition";
+
   const docSide = document.getElementById("addTitles");
   export let token;
   export let user_id;
   let content = "";
   let title = "";
-  let alldocs = [];
+  let alldocs = [0];
   let currentdoc = null;
 
   function updateCurrentDoc(i) {
@@ -15,48 +19,22 @@
   function getCurrentUserDocs() {
     let myHeaders = new Headers();
     myHeaders.append("Authorization", token);
-    let URLSearchParams = new URLSearchParams();
-    URLSearchParams.append("user_id", user_id);
+    let urlencoded = new URLSearchParams();
     let requestOptions = {
       method: "GET",
       headers: myHeaders,
     };
     fetch(`http://127.0.0.1:3000/api/docs/owner`, requestOptions)
       .then((response) => response.json())
-      .then((result) => fillSideBar(result))
+      .then((result) => temp(result))
       .catch((error) => console.log("error", error));
   }
 
-  fetch(`http://127.0.0.1:3000/api/docs`)
-    .then((response) => response.json())
-    .then((result) => handleDoc(result))
-    .catch((error) => console.log("error", error));
-
-  function handleDoc(data) {
-    alldocs = [alldocs, ...data];
-  }
-
-  function getbyOwnerID() {
-    let myHeaders = new Headers();
-    myHeaders.append("Authorization", token);
-    let requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-    };
-    fetch(`http://127.0.0.1:3000/api/docs/owner`, requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
-  }
-  function fillSideBar(data) {
-    if (data != null) {
-      for (let i = 0; i < data.length; i++) {
-        let title = data[i].title;
-        let id = data[i].id;
-        let newDiv = document.createElement("div");
-        newDiv.innerHTML = `<button class="btn btn-primary" onclick="loadDoc(${data[i]})">${title}</button>`;
-        docSide.appendChild(newDiv);
-      }
+  function temp(data) {
+    if (alldocs[0] == 0) {
+      alldocs = data;
+    } else {
+      alldocs = [...alldocs, data];
     }
   }
 
@@ -74,10 +52,12 @@
     };
 
     fetch(`http://127.0.0.1:3000/api/docs`, requestOptions)
-      .then((response) => response.text())
-      .then((result) => alert(result))
+      .then((response) => response.json())
+      .then((result) => temp(result)) //need more here to veryify good response
       .catch((error) => alert(error));
   }
+
+  getCurrentUserDocs();
 
   function handleEditForm() {
     let filename = document.getElementById("title").value;
@@ -91,13 +71,16 @@
   }
 </script>
 
-<div class="container-fluid">
+<div transition:fade class="container-fluid">
   <div class="row">
-    <div class="col-2 bg-secondary" style="height: 100vh">
-      <div class="row justify-content-center" id="addTitles">
+    <div class="col-2 border" style="height: 100vh">
+      <div class="row justify-content-center " id="addTitles">
         {#each alldocs as doc, i}
           <button
-            class="btn mt-2 btn-primary col-10 rounded-pill"
+            transition:fly={{ y: 200, duration: 1000 + i * 55 }}
+            class="btn fw-bold mt-2 btn-primary col-10 rounded-pill"
+            style="text-overflow: ellipsis; white-space: nowrap;
+            overflow: hidden;;"
             on:click={() => updateCurrentDoc(i)}
           >
             {doc.title}
@@ -106,12 +89,8 @@
       </div>
     </div>
     <form class="col-10" style="height: 100vh">
-      <div class="row justify-content-around mt-1">
-        <div class="col-2">
-          <button class="btn-success btn" on:click={handleSaveForm}>save</button
-          >
-        </div>
-        <div class="col-3">
+      <div class="row  mt-1">
+        <div class="col-5">
           <input
             type="text"
             bind:value={title}
@@ -120,9 +99,19 @@
             class="form-control"
           />
         </div>
+        <div class="col-7 ">
+          <div class="row justify-content-end ">
+            <div class="col-auto">
+              <button
+                class=" align-right btn-success btn"
+                on:click={handleSaveForm}>save</button
+              >
+            </div>
 
-        <div class="col-2">
-          <button class="btn-info btn" id="new-file">new file</button>
+            <div class="col-auto mr-1">
+              <button class="btn-info btn me-4" id="new-file">new file</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="row" style="height: 100%; width: 100%">
@@ -137,10 +126,6 @@
         </div>
       </div>
     </form>
-    <div class="col">
-      <button class="btn btn-primary" on:click={getbyOwnerID}
-        >getbyOwnerID</button
-      >
-    </div>
+    <div class="col" />
   </div>
 </div>

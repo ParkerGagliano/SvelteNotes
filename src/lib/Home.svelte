@@ -3,7 +3,7 @@
   export let token;
   export let username;
   export let authenicated;
-  let secret;
+  let secret = "";
   function getSecretData() {
     fetch("http://localhost:3000/api/login", {
       method: "GET",
@@ -13,7 +13,6 @@
     })
       .then((response) => response.text())
       .then((data) => {
-        console.log(data);
         handleData(data);
       });
   }
@@ -22,7 +21,6 @@
       authenicated = false;
       return;
     }
-    console.log(data);
     secret = data;
   }
 </script>
@@ -30,19 +28,7 @@
 <div transition:fade class="container">
   <div class="row">
     <div class="col">
-      <h3>Welcome back: {username}</h3>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      {#if secret}
-        <h1 transition:fade>{secret}</h1>
-      {/if}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <button on:click={getSecretData}>Reveal only logged in info</button>
+      <h3 class="text-center">{username.toUpperCase()}'s Notes</h3>
     </div>
   </div>
 </div>

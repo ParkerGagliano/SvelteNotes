@@ -12,14 +12,14 @@
   let token;
   function successfulLogin(result) {
     authenticated = true;
-    token = "JWT " + result.accessToken;
+    token = "JWT " + result.accessToken + " " + result.user.id;
     console.log(token);
     username = result.user.username;
     user_id = result.user.id;
   }
 </script>
 
-<main>
+<main class="container">
   {#if authenticated}
     <Home {authenticated} {username} {token} />
     <AddDoc {user_id} {token} />
