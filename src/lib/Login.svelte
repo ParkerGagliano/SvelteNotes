@@ -61,6 +61,8 @@
       message = result.message;
     }
   }
+
+  // Set the JWT as a cookie that expires in 7 days
 </script>
 
 <div class="row">

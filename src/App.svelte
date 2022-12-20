@@ -10,6 +10,7 @@
   let username = "";
   let user_id = "";
   let token;
+
   function successfulLogin(result) {
     authenticated = true;
     token = "JWT " + result.accessToken + " " + result.user.id;
