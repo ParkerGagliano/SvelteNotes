@@ -1,10 +1,11 @@
 <script>
-  export let successfulLogin;
   import { fade } from "svelte/transition";
   let modal = false;
   let message = "joe";
   let password = "";
   let username = "";
+  export let successfulLogin;
+  console.log();
 
   function checkValid() {
     if (username == "") {

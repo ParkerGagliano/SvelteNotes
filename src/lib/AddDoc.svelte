@@ -1,5 +1,4 @@
 <script>
-  import { select_option, time_ranges_to_array } from "svelte/internal";
   import { get } from "svelte/store";
   import { fade } from "svelte/transition";
   import { fly } from "svelte/transition";

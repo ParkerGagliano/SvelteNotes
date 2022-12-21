@@ -5,7 +5,7 @@
   let password = "";
   let confirmPassword = "";
   let username = "";
-
+  export let handleSuccessfulRegister;
   function checkValid() {
     if (username == "") {
       modal = true;
@@ -54,7 +54,7 @@
 
       fetch(`http://127.0.0.1:3000/api/register`, requestOptions)
         .then((response) => response.json())
-        .then((result) => console.log(result))
+        .then((result) => handleSuccessfulRegister())
         .catch((error) => alert(error));
     }
   }
