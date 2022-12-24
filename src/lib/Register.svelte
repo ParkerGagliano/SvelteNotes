@@ -1,40 +1,52 @@
 <script>
-  import { fade } from "svelte/transition";
-  let modal = false;
-  let message = "joe";
+  import { slide } from "svelte/transition";
+
   let password = "";
   let confirmPassword = "";
   let username = "";
+  let message = "";
+  let tone = "";
   export let handleSuccessfulRegister;
   function checkValid() {
     if (username == "") {
-      modal = true;
-      message = "Username cannot be empty";
+      handleError("Username cannot be empty");
+
       return false;
     }
     if (username.length < 3) {
-      modal = true;
-      message = "Username must be at least 3 characters";
+      handleError("Username must be at least 3 characters");
       return false;
     }
     if (password == "") {
-      modal = true;
-      message = "Password cannot be empty";
+      handleError("Password cannot be empty");
       return false;
     }
     if (password.length < 8) {
-      modal = true;
-      message = "Password must be at least 8 characters";
+      handleError("Password must be at least 8 characters");
       return false;
     }
     if (password == confirmPassword) {
-      modal = false;
       return true;
     } else {
-      modal = true;
-      message = "Passwords do not match";
+      handleError("Passwords do not match");
       return false;
     }
+  }
+
+  function handleError(a) {
+    message = a;
+    tone = "danger";
+    setTimeout(() => {
+      message = "";
+    }, 1500);
+  }
+
+  function handleMessage(a) {
+    message = a;
+    tone = "success";
+    setTimeout(() => {
+      message = "";
+    }, 1500);
   }
 
   function handleRegister() {
@@ -55,7 +67,7 @@
       fetch(`http://127.0.0.1:3000/api/register`, requestOptions)
         .then((response) => response.json())
         .then((result) => handleSuccessfulRegister())
-        .catch((error) => alert(error));
+        .catch((error) => handleError(error));
     }
   }
 </script>
@@ -97,14 +109,6 @@
           />
         </div>
 
-        {#if modal}
-          <div
-            transition:fade={{ duration: 100 }}
-            class="bg-danger mt-2 rounded-pill"
-          >
-            {message}
-          </div>
-        {/if}
         <div class="form-group mt-2">
           <button
             class="form-control"
@@ -114,6 +118,14 @@
             Register</button
           >
         </div>
+        {#if message}
+          <div
+            transition:slide={{ duration: 200 }}
+            class="bg-danger mt-2 rounded-pill"
+          >
+            <p class="text-center">{message}</p>
+          </div>
+        {/if}
       </form>
     </div>
   </div>

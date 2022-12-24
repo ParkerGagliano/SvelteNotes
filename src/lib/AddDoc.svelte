@@ -1,7 +1,5 @@
 <script>
-  import { get } from "svelte/store";
-  import { fade } from "svelte/transition";
-  import { fly } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   const docSide = document.getElementById("addTitles");
   export let token;
   export let user_id;
@@ -40,14 +38,18 @@
     fetch(`http://127.0.0.1:3000/api/docs/owner`, requestOptions)
       .then((response) => response.json())
       .then((result) => updateAllLocalDocs(result))
-      .catch((error) => console.log("error", error));
+      .catch((error) => handleError(error));
   }
   function handleDeleteForm() {
     let myHeaders = new Headers();
     myHeaders.append("Authorization", token);
     let urlencoded = new URLSearchParams();
-    console.log(alldocs[currentdoc].id);
-    console.log(alldocs);
+
+    if (isediting == false) {
+      handleMessage("Nothing to delete");
+      return;
+    }
+
     urlencoded.append("id", alldocs[currentdoc].id);
     let requestOptions = {
       method: "DELETE",
@@ -56,31 +58,35 @@
     };
     fetch(`http://127.0.0.1:3000/api/docs/owner`, requestOptions)
       .then((response) => response.text())
-      .then((result) => updateAllLocalDocs(result))
-      .catch((error) => console.log("error", error));
+      .then((result) => handleSuccessfulDelete(result))
+      .catch((error) => handleError(error));
   }
+
+  function handleSuccessfulDelete(data) {
+    alldocs = [
+      ...alldocs.slice(0, currentdoc),
+      ...alldocs.slice(currentdoc + 1),
+    ];
+
+    content = "";
+    title = "";
+
+    isediting = false;
+    handleMessage("Deleted Successfully");
+  }
+
   function updateAllLocalDocs(data) {
-    console.log(data);
     if (isediting == false) {
       if (alldocs[0] == 0) {
         alldocs = data;
       } else {
         alldocs = [...alldocs, data];
         isediting = true;
-        handleMessage("Added to server");
+        handleMessage("Added successfully");
       }
     } else {
-      if (data == "Document deleted") {
-        alldocs = [
-          ...alldocs.slice(0, currentdoc),
-          ...alldocs.slice(currentdoc + 1),
-        ];
-        isediting = true;
-        handleMessage("Deleted Successfully");
-      } else {
-        alldocs[currentdoc] = data;
-        handleMessage(`Edited ${alldocs[currentdoc].title} Successfully`);
-      }
+      alldocs[currentdoc] = data;
+      handleMessage(`Edited ${alldocs[currentdoc].title} Successfully`);
     }
   }
 
@@ -127,15 +133,13 @@
     fetch(`http://127.0.0.1:3000/api/docs`, requestOptions)
       .then((response) => response.json())
       .then((result) => updateAllLocalDocs(result)) //need more here to veryify good response
-      .catch((error) => alert(error));
+      .catch((error) => handleError(error));
     currentdoc = alldocs.length;
   }
   getCurrentUserDocs();
   function handleEditForm() {
     let myHeaders = new Headers();
     let urlencoded = new URLSearchParams();
-    console.log(currentdoc);
-    console.log(alldocs[currentdoc].id);
     urlencoded.append("id", alldocs[currentdoc].id);
     urlencoded.append("title", title);
     urlencoded.append("content", content);
@@ -150,7 +154,7 @@
     fetch(`http://127.0.0.1:3000/api/docs/owner`, requestOptions)
       .then((response) => response.json())
       .then((result) => updateAllLocalDocs(result)) //need more here to veryify good response
-      .catch((error) => alert(error));
+      .catch((error) => handleError(error));
   }
   function newFile() {
     title = "";
@@ -177,15 +181,15 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-2 border">
+    <div class="col-2 border rounded">
       <div class="row justify-content-center  " id="addTitles">
         {#each alldocs as doc, i}
           {#if doc.name != "undefined"}
             <button
               transition:fly={{ y: 200, duration: 1000 + i * 55 }}
-              class="btn fw-bold mt-2 btn-primary col-10 rounded-pill"
+              class="btn fw-bold mt-2  col-10 rounded-pill"
               style="text-overflow: ellipsis; white-space: nowrap;
-            overflow: hidden;;"
+            overflow: hidden; background-color: rgb(224, 224, 224);"
               on:click={() => updateCurrentDoc(i)}
             >
               {doc.title}
@@ -198,12 +202,12 @@
       <div class="row justify-content-between mt-1">
         <div class="col-12 col-lg-5">
           <input
-            class="text-bgs rounded"
+            class=" rounded"
             type="text"
             bind:value={title}
             id="title"
             placeholder="Title"
-            style="width: 96%; height:100%; border: none; "
+            style="width: 96%; height:100%; border: none; background-color: rgb(38,41,42); color: white "
           />
         </div>
         <div class="col-lg-auto col-12">
@@ -235,10 +239,10 @@
             placeholder="Content"
             rows="32"
             bind:value={content}
-            class="mt-2 text-bgs rounded"
+            class="mt-2  rounded"
             id="main-text"
             type="text"
-            style="width: 100%; outline: none; resize: none; border: none
+            style="width: 100%; outline: none; resize: none; border: none; color: white; background-color: rgb(38,41,42);
             "
           />
         </div>

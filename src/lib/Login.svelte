@@ -1,7 +1,8 @@
 <script>
-  import { fade } from "svelte/transition";
-  let modal = false;
-  let message = "joe";
+  import { slide } from "svelte/transition";
+
+  let message = "";
+  let tone = "";
   let password = "";
   let username = "";
   export let successfulLogin;
@@ -9,26 +10,27 @@
 
   function checkValid() {
     if (username == "") {
-      modal = true;
-      message = "Username cannot be empty";
+      handleError("Username cannot be empty");
       return false;
     }
     if (username.length < 3) {
-      modal = true;
-      message = "Username must be at least 3 characters";
+      handleError("Username must be at least 3 characters");
       return false;
     }
     if (password == "") {
-      modal = true;
-      message = "Password cannot be empty";
+      handleError("Password cannot be empty");
       return false;
     }
-    if (password.length < 8) {
-      modal = true;
-      message = "Password must be at least 8 characters";
-      return false;
-    }
+
     return true;
+  }
+
+  function handleError(a) {
+    message = a;
+    tone = "danger";
+    setTimeout(() => {
+      message = "";
+    }, 1500);
   }
 
   function handleLogin() {
@@ -48,7 +50,7 @@
       fetch(`http://127.0.0.1:3000/api/login`, requestOptions)
         .then((response) => response.json())
         .then((result) => handleResult(result))
-        .catch((error) => alert(error));
+        .catch((error) => handleError(error));
     }
   }
 
@@ -58,7 +60,6 @@
       console.log("success");
       successfulLogin(result);
     } else {
-      modal = true;
       message = result.message;
     }
   }
@@ -93,14 +94,7 @@
             bind:value={password}
           />
         </div>
-        {#if modal}
-          <div
-            transition:fade={{ duration: 100 }}
-            class="bg-danger mt-2 rounded-pill"
-          >
-            {message}
-          </div>
-        {/if}
+
         <div class="form-group mt-2">
           <button
             class="form-control"
@@ -110,6 +104,14 @@
             Login</button
           >
         </div>
+        {#if message}
+          <div
+            transition:slide={{ duration: 200 }}
+            class="bg-danger mt-2 rounded-pill"
+          >
+            <p class="text-center">{message}</p>
+          </div>
+        {/if}
       </form>
     </div>
   </div>

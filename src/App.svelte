@@ -1,12 +1,10 @@
 <script>
-  import svelteLogo from "./assets/svelte.svg";
-  import Counter from "./lib/Counter.svelte";
-  import Register from "./lib/Register.svelte";
+  import { fly } from "svelte/transition";
+  import AddDoc from "./lib/AddDoc.svelte";
   import Home from "./lib/Home.svelte";
   import Login from "./lib/Login.svelte";
-  import AddDoc from "./lib/AddDoc.svelte";
-  import { fade } from "svelte/transition";
-  import { fly } from "svelte/transition";
+  import Register from "./lib/Register.svelte";
+
   let registerpage = true;
   let authenticated = false;
   let username = "";
@@ -16,8 +14,6 @@
   let buttonEnabled = true;
   let message = "";
   let tone = "";
-
-  $: console.log(loginpage);
 
   function successfulLogin(result) {
     loginpage = false;
@@ -92,7 +88,8 @@
         <div class="col-auto mt-5">
           {#if buttonEnabled == true}
             <button
-              class="btn btn-info"
+              class="btn "
+              style="background-color: rgb(33, 158, 60)"
               transition:fly={{ y: -200, duration: 500 }}
               on:click={toggleRegister}
               >{#if registerpage == true}Login{:else}Register{/if}</button
